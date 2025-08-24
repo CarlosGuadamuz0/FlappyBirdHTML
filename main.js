@@ -9,15 +9,15 @@ window.addEventListener("DOMContentLoaded", () => {
   const playAgainButton = document.getElementById('play-again-button');
   const finalScoreDisplay = document.getElementById('final-score');
   const highScoreDisplay = document.getElementById('high-score');
-  const jumpButton = document.getElementById('Jump'); // Get the jump button
-  let hasStarted=0
+  const jumpButton = document.getElementById('Jump'); 
+  let hasStarted = 0;
 
   const scoreDisplay = document.createElement('div');
+  scoreDisplay.classList.add('score');
   Object.assign(scoreDisplay.style, {
     position: 'absolute',
     top: '20px',
     left: '20px',
-    fontSize: '3em',
     color: 'white',
     textShadow: '2px 2px 4px #000',
     zIndex: '2'
@@ -31,48 +31,59 @@ window.addEventListener("DOMContentLoaded", () => {
   let gameLoopId;
   let gravityLoopId;
 
+  // Configuration values, some now calculated dynamically
   const config = {
     GRAVITY: 0.07,
     JUMP_STRENGTH: 3,
-    BLOCK_SIZE: 64,
-    PIPE_SIZE: 64,
-    PIPE_COUNT: 5,
-    PIPE_GAP_VH: 40,
-    HORIZONTAL_GAP: 250,
-    SPEED: 2,
-    PLAYER_X: 200
+    // The following will be calculated based on the CSS variable
+    PLAYER_X: 0
   };
 
+  function getBlockSize() {
+    return parseFloat(getComputedStyle(app).getPropertyValue('--block-size'));
+  }
+
   function initPlayer() {
+    const blockSize = getBlockSize();
+    config.PLAYER_X = blockSize * 3;
     Object.assign(player.style, {
       position: "absolute",
-      top: "50vh",
-      width: `${config.BLOCK_SIZE}px`,
-      left: `${config.PLAYER_X}px`
+      top: `50vh`,
+      left: `${config.PLAYER_X}px`,
+      width: `${blockSize}px`,
+      height: `${blockSize}px`
     });
   }
 
   function createGround() {
     ground.innerHTML = '';
-    const blocks = Math.ceil(window.innerWidth / config.BLOCK_SIZE);
+    const blockSize = getBlockSize();
+    const blocks = Math.ceil(window.innerWidth / blockSize);
     for (let i = 0; i < blocks; i++) {
       const grass = Object.assign(document.createElement("img"), {
         src: "grass.png",
-        width: config.BLOCK_SIZE,
+        width: blockSize,
         alt: "Grass"
       });
       ground.appendChild(grass);
     }
   }
 
-function createPipes() {
+  function createPipes() {
     pipes.forEach(pipe => pipe.remove());
     pipes = [];
+    const blockSize = getBlockSize();
     
-    for (let i = 0; i < config.PIPE_COUNT; i++) {
-      const randomHeight = () => Math.floor(Math.random() * (40 - 20) + 20);
+    // Convert to relative values
+    const horizontalGap = blockSize * 4;
+    const pipeSize = blockSize;
+    const pipeGapVh = 40; // Still using vh for the gap for a better scaling effect
+    const pipeCount = 5;
+
+    for (let i = 0; i < pipeCount; i++) {
+      const randomHeight = () => Math.floor(Math.random() * (50 - 20) + 20);
       const bottomHeight = randomHeight();
-      const leftPosition = window.innerWidth + 200 + i * config.HORIZONTAL_GAP;
+      const leftPosition = window.innerWidth + horizontalGap + i * horizontalGap;
 
       const createPipe = (isBottom) => {
         const pipe = document.createElement("div");
@@ -80,10 +91,10 @@ function createPipes() {
         pipe.classList.add(isBottom ? "bottom" : "top");
         pipe.dataset.id = i;
         Object.assign(pipe.style, {
-          width: `${config.PIPE_SIZE}px`,
+          width: `${pipeSize}px`,
           position: "absolute",
           left: `${leftPosition}px`,
-          ...(isBottom ? { bottom: "0", height: `${bottomHeight}vh` } : { top: "0", height: `${100 - bottomHeight - config.PIPE_GAP_VH}vh` })
+          ...(isBottom ? { bottom: "0", height: `${bottomHeight}vh` } : { top: "0", height: `${100 - bottomHeight - pipeGapVh}vh` })
         });
         gameContainer.appendChild(pipe);
         pipes.push(pipe);
@@ -99,9 +110,12 @@ function createPipes() {
   }
   
   function movePipes() {
+    const speed = getBlockSize() / 32; // Speed now depends on block size
+    const horizontalGap = getBlockSize() * 4;
+
     pipes.forEach((pipe) => {
       let left = parseFloat(pipe.style.left);
-      left -= config.SPEED;
+      left -= speed;
       pipe.style.left = `${left}px`;
 
       const playerX = player.getBoundingClientRect().left;
@@ -120,12 +134,12 @@ function createPipes() {
         const bottomHeight = Math.floor(Math.random() * (50 - 20) + 20);
         const isBottom = pipe.style.bottom === "0px";
 
-        pipe.style.height = `${isBottom ? bottomHeight : 100 - bottomHeight - config.PIPE_GAP_VH}vh`;
-        pipe.style.left = `${window.innerWidth + config.HORIZONTAL_GAP}px`;
+        pipe.style.height = `${isBottom ? bottomHeight : 100 - bottomHeight - 40}vh`;
+        pipe.style.left = `${window.innerWidth + horizontalGap}px`;
         
         const index = passedPipes.indexOf(pipeId);
         if (index > -1) {
-            passedPipes.splice(index, 1);
+          passedPipes.splice(index, 1);
         }
       }
     });
@@ -157,9 +171,10 @@ function createPipes() {
 
   function applyGravity() {
     let currentTop = parseFloat(player.style.top);
+    const gravity = getBlockSize() / 800;
     currentTop += velocity;
     player.style.top = `${currentTop}px`;
-    velocity += config.GRAVITY;
+    velocity += gravity;
 
     if (currentTop < 0) {
       player.style.top = "0px";
@@ -172,21 +187,21 @@ function createPipes() {
 
   function handleJump(e) {
     if (e.code === "Space") {
-      velocity = -config.JUMP_STRENGTH;
+      const jumpStrength = getBlockSize() / 20;
+      velocity = -jumpStrength;
     }
   }
 
   function handleTouchJump() {
-      velocity = -config.JUMP_STRENGTH;
+    const jumpStrength = getBlockSize() / 20;
+    velocity = -jumpStrength;
   }
 
   function gameOver() {
     cancelAnimationFrame(gameLoopId);
     cancelAnimationFrame(gravityLoopId);
     document.removeEventListener("keydown", handleJump);
-    gameContainer.removeEventListener("touchstart", handleTouchJump); // Remove touch listener
-    jumpButton.removeEventListener('click', handleTouchJump); // Remove click listener
-
+    jumpButton.removeEventListener('click', handleTouchJump); 
     gameContainer.style.display = 'none';
     gameOverScreen.style.display = 'block';
 
@@ -210,14 +225,15 @@ function createPipes() {
     updateScore();
     initPlayer();
     createPipes();
+    createGround();
     
     document.addEventListener("keydown", handleJump);
-    gameContainer.addEventListener("touchstart", handleTouchJump);
-    jumpButton.addEventListener('click', handleTouchJump); // Add click listener
-
-    if (hasStarted===0){
+    jumpButton.addEventListener('click', handleTouchJump);
+    
+    // Make sure gravity only starts once
+    if (hasStarted === 0) {
       gravityLoopId = requestAnimationFrame(applyGravity);
-      hasStarted=1
+      hasStarted = 1;
     }
     gameLoopId = requestAnimationFrame(movePipes);
   }
