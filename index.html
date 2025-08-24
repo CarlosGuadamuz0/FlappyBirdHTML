@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Flappy Bird</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div id="app">
+    <div id="main-menu" class="screen">
+      <h1>Flappy Bird</h1>
+      <p>Click "Start" or press Space to begin.</p>
+      <button id="start-button">Start</button>
+    </div>
+
+    <div id="game-over-screen" class="screen">
+      <h1>Game Over</h1>
+      <h2 id="final-score"></h2>
+      <h2 id="high-score"></h2>
+      <button id="play-again-button">Play Again</button>
+    </div>
+    
+    <div id="game-container" onclick="handleTouchJump()">
+      <img id="player" src="flappy-bird.png" alt="Flappy Bird">
+      <div id="pipes"></div>
+      <div id="ground"></div>
+      <button id="Jump" >Jump</button>
+    </div>
+  </div>
+
+  <script src="main.js" defer></script>
+</body>
+</html>

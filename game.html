@@ -1,0 +1,22 @@
+<div id="app">
+    <img id="player" src="flappy-bird.png" width="10%" alt="Flappy Bird">
+    <div id="ground"></div>
+  </div>
+
+  <script>
+    const ground = document.getElementById("ground");
+
+    const blockSize = 64;
+    const blocks = Math.ceil(window.innerWidth / blockSize);
+
+    for (let i = 0; i < blocks; i++) {
+      const grass = document.createElement("img");
+      grass.src = "grass.png";
+      grass.width = blockSize;
+      grass.alt = "Grass";
+      ground.appendChild(grass);
+    }
+    window.requestAnimationFrame(gravity);
+  </script>
+
+  <script src="main.js" defer></script>
