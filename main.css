@@ -1,14 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Main application container */
 body {
     margin: 0;
     overflow: hidden;
-    /* Use a root font size to help with scaling */
-    font-size: 16px;
+    font-size: 16px; /* Base font size for relative units */
 }
 
 #app {
-    --block-size: 5vw; /* This variable controls all major dimensions */
+    --block-size: 10vw; /* Default for desktop */
+    --player-size: 80vw;
+    --ground-size: 3vw;
+    --pipe-size: 110vw;
+
     width: 100%;
     height: 100vh;
     display: flex;
@@ -19,12 +23,18 @@ body {
     background-size: 100% 100%;
 }
 
+/* Adjust for smaller screens (e.g., mobile phones) */
 @media (max-width: 768px) {
     #app {
         --block-size: 10vw; /* Adjust for mobile screens */
+        --player-size: 80vw;
+        --ground-size: 14vw;
+        --pipe-size: 80vw;
+
     }
 }
 
+/* Styles for the screens (main menu, game over) */
 .screen {
     text-align: center;
     color: #fff;
@@ -35,6 +45,7 @@ body {
     background: rgba(0, 0, 0, 0.4);
     box-shadow: 0 0 calc(var(--block-size) / 2) rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
+    max-width: 90vw; /* Ensure screens don't overflow on small devices */
 }
 
 .screen h1 {
@@ -42,6 +53,7 @@ body {
     margin-bottom: 0.5em;
     color: #ffeb3b;
     animation: bounce 1s infinite;
+    white-space: nowrap; /* Prevents text from wrapping */
 }
 
 @keyframes bounce {
@@ -63,8 +75,8 @@ body {
 }
 
 #player {
-    width: var(--block-size);
-    height: var(--block-size);
+    width: var(--player-size);
+    height: var(--player-size);
     transition: transform 0.1s ease-out;
 }
 
@@ -72,7 +84,7 @@ body {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: calc(var(--block-size) * 2);
+    height: calc(var(--ground-size) * 2);
     display: flex;
     align-items: center;
     background-color: #8B4513;
@@ -90,7 +102,7 @@ body {
 }
 
 .pipe {
-    width: var(--block-size);
+    width: var(--pipe-size);
     position: absolute;
     background-image: url('https://raw.githubusercontent.com/samuelcust/flappy-bird-assets/master/sprites/pipe-green.png');
     background-size: cover;
@@ -104,10 +116,11 @@ body {
     transform: rotate(180deg) scaleY(1);
 }
 
+/* Jump Button for mobile */
 #Jump {
     position: fixed;
-    bottom: var(--block-size);
-    right: var(--block-size);
+    bottom: calc(var(--block-size) * 0.5); /* Adjust position to be responsive */
+    right: calc(var(--block-size) * 0.5);
     padding: calc(var(--block-size) / 2);
     font-size: calc(var(--block-size) / 3);
     font-family: 'Press Start 2P', cursive;
@@ -133,6 +146,7 @@ body {
     transform: translateY(3px) translateX(3px);
 }
 
+/* Start and Play Again buttons */
 #start-button, #play-again-button {
     background: #ffeb3b;
     color: #2c3e50;

@@ -43,9 +43,21 @@ window.addEventListener("DOMContentLoaded", () => {
     return parseFloat(getComputedStyle(app).getPropertyValue('--block-size'));
   }
 
+  function getPipeSize() {
+    return parseFloat(getComputedStyle(app).getPropertyValue('--pipe-size'));
+  }
+
+ function getPlayerSize() {
+    return parseFloat(getComputedStyle(app).getPropertyValue('--player-size'));
+  }
+
+  function getGroundSize() {
+    return parseFloat(getComputedStyle(app).getPropertyValue('--ground-size'));
+  }
+
   function initPlayer() {
-    const blockSize = getBlockSize();
-    config.PLAYER_X = blockSize * 3;
+    const blockSize = getPlayerSize();
+    config.PLAYER_X = blockSize * 1.5;
     Object.assign(player.style, {
       position: "absolute",
       top: `50vh`,
@@ -57,12 +69,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function createGround() {
     ground.innerHTML = '';
-    const blockSize = getBlockSize();
+    const blockSize = getGroundSize();
     const blocks = Math.ceil(window.innerWidth / blockSize);
     for (let i = 0; i < blocks; i++) {
       const grass = Object.assign(document.createElement("img"), {
         src: "grass.png",
-        width: blockSize,
+        width: 1,
         alt: "Grass"
       });
       ground.appendChild(grass);
@@ -72,10 +84,10 @@ window.addEventListener("DOMContentLoaded", () => {
   function createPipes() {
     pipes.forEach(pipe => pipe.remove());
     pipes = [];
-    const blockSize = getBlockSize();
+    const blockSize = getPipeSize();
     
     // Convert to relative values
-    const horizontalGap = blockSize * 4;
+    const horizontalGap = blockSize * 6;
     const pipeSize = blockSize;
     const pipeGapVh = 40; // Still using vh for the gap for a better scaling effect
     const pipeCount = 5;
@@ -110,8 +122,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   
   function movePipes() {
-    const speed = getBlockSize() / 32; // Speed now depends on block size
-    const horizontalGap = getBlockSize() * 4;
+    const speed = getPipeSize() / 32; // Speed now depends on block size
+    const horizontalGap = getBlockSize() * 1;
 
     pipes.forEach((pipe) => {
       let left = parseFloat(pipe.style.left);
@@ -171,7 +183,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function applyGravity() {
     let currentTop = parseFloat(player.style.top);
-    const gravity = getBlockSize() / 800;
+    const gravity = getPipeSize() / 800;
     currentTop += velocity;
     player.style.top = `${currentTop}px`;
     velocity += gravity;
@@ -187,13 +199,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function handleJump(e) {
     if (e.code === "Space") {
-      const jumpStrength = getBlockSize() / 20;
+      const jumpStrength = getPipeSize() / 20;
       velocity = -jumpStrength;
     }
   }
 
   function handleTouchJump() {
-    const jumpStrength = getBlockSize() / 20;
+    const jumpStrength = getPipeSize() / 20;
     velocity = -jumpStrength;
   }
 
